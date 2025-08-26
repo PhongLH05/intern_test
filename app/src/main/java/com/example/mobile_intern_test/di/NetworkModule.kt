@@ -1,19 +1,29 @@
 package com.example.mobile_intern_test.di
 
-import com.example.mobile_intern_test.data.api.HereApiService
+import com.example.mobile_intern_test.data.api.LocationApiService
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.util.concurrent.TimeUnit
 
 object NetworkModule {
     
-    private const val BASE_URL = "https://geocode.search.hereapi.com/"
+    private const val BASE_URL = "https://nominatim.openstreetmap.org/"
     
     private val okHttpClient = OkHttpClient.Builder()
         .addInterceptor(HttpLoggingInterceptor().apply {
             level = HttpLoggingInterceptor.Level.BODY
         })
+        .addInterceptor { chain ->
+            val request = chain.request().newBuilder()
+                .addHeader("User-Agent", "MobileInternTest/1.0")
+                .build()
+            chain.proceed(request)
+        }
+        .connectTimeout(30, TimeUnit.SECONDS)
+        .readTimeout(30, TimeUnit.SECONDS)
+        .writeTimeout(30, TimeUnit.SECONDS)
         .build()
     
     private val retrofit = Retrofit.Builder()
@@ -22,5 +32,5 @@ object NetworkModule {
         .addConverterFactory(GsonConverterFactory.create())
         .build()
     
-    val hereApiService: HereApiService = retrofit.create(HereApiService::class.java)
+    val locationApiService: LocationApiService = retrofit.create(LocationApiService::class.java)
 }

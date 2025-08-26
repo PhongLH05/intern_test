@@ -9,19 +9,17 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.mobile_intern_test.data.repository.AddressRepository
+import com.example.mobile_intern_test.data.repository.LocationRepository
 import com.example.mobile_intern_test.databinding.ActivityMainBinding
 import com.example.mobile_intern_test.di.NetworkModule
-import com.example.mobile_intern_test.ui.adapter.AddressAdapter
-import com.example.mobile_intern_test.ui.viewmodel.AddressSearchViewModel
+import com.example.mobile_intern_test.ui.adapter.LocationAdapter
+import com.example.mobile_intern_test.ui.viewmodel.LocationSearchViewModel
 
 class MainActivity : AppCompatActivity() {
     
     private lateinit var binding: ActivityMainBinding
-    private lateinit var viewModel: AddressSearchViewModel
-    private lateinit var addressAdapter: AddressAdapter
-    
-    private val HERE_API_KEY = "IQrjZrk2hHHIRTeCkoPAsXTAc-oWy7MI_a-tLfScIEY"
+    private lateinit var viewModel: LocationSearchViewModel
+    private lateinit var locationAdapter: LocationAdapter
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,26 +34,26 @@ class MainActivity : AppCompatActivity() {
     }
     
     private fun setupViewModel() {
-        val repository = AddressRepository(NetworkModule.hereApiService)
+        val repository = LocationRepository(NetworkModule.locationApiService)
         
         val factory = object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                if (modelClass.isAssignableFrom(AddressSearchViewModel::class.java)) {
+                if (modelClass.isAssignableFrom(LocationSearchViewModel::class.java)) {
                     @Suppress("UNCHECKED_CAST")
-                    return AddressSearchViewModel(repository) as T
+                    return LocationSearchViewModel(repository) as T
                 }
                 throw IllegalArgumentException("Unknown ViewModel class")
             }
         }
         
-        viewModel = ViewModelProvider(this, factory)[AddressSearchViewModel::class.java]
+        viewModel = ViewModelProvider(this, factory)[LocationSearchViewModel::class.java]
     }
     
     private fun setupRecyclerView() {
-        addressAdapter = AddressAdapter(emptyList(), "")
+        locationAdapter = LocationAdapter(emptyList(), "")
         binding.rvAddresses.apply {
             layoutManager = LinearLayoutManager(this@MainActivity)
-            adapter = addressAdapter
+            adapter = locationAdapter
         }
     }
     
@@ -75,18 +73,14 @@ class MainActivity : AppCompatActivity() {
     }
     
     private fun performSearch(query: String) {
-        if (HERE_API_KEY == "YOUR_HERE_API_KEY_HERE") {
-            showError("Please add your HERE API key to the MainActivity")
-            return
-        }
-        
-        viewModel.searchAddresses(query, HERE_API_KEY)
+        // Search with country code filter for Vietnam (VN) for better accuracy
+        viewModel.searchLocations(query, "VN")
     }
     
     private fun observeViewModel() {
-        viewModel.searchResults.observe(this) { addresses ->
-            if (addresses.isNotEmpty()) {
-                showResults(addresses)
+        viewModel.searchResults.observe(this) { locations ->
+            if (locations.isNotEmpty()) {
+                showResults(locations)
             } else {
                 showEmptyState()
             }
@@ -104,14 +98,14 @@ class MainActivity : AppCompatActivity() {
         }
     }
     
-    private fun showResults(addresses: List<com.example.mobile_intern_test.data.model.AddressItem>) {
+    private fun showResults(locations: List<com.example.mobile_intern_test.data.model.LocationDetail>) {
         binding.rvAddresses.visibility = View.VISIBLE
         binding.emptyState.visibility = View.GONE
         binding.tvError.visibility = View.GONE
         
         val currentQuery = binding.etSearch.text.toString()
-        addressAdapter = AddressAdapter(addresses, currentQuery)
-        binding.rvAddresses.adapter = addressAdapter
+        locationAdapter = LocationAdapter(locations, currentQuery)
+        binding.rvAddresses.adapter = locationAdapter
     }
     
     private fun showEmptyState() {
