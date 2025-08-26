@@ -21,7 +21,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var viewModel: AddressSearchViewModel
     private lateinit var addressAdapter: AddressAdapter
     
-    private val HERE_API_KEY = "YOUR_HERE_API_KEY_HERE"
+    private val HERE_API_KEY = "IQrjZrk2hHHIRTeCkoPAsXTAc-oWy7MI_a-tLfScIEY"
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
