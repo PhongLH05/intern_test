@@ -1,5 +1,1 @@
-<figure class="video_container">
- <video controls="true" allowfullscreen="true">
- <source src="Video/intern_test.mp4" type="video/mp4">
- </video>
-</figure>
+https://github.com/user-attachments/assets/4192adab-20a6-46c8-8482-28095d9e0674
